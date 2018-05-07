@@ -11,6 +11,7 @@ module W7 where
 import Data.List
 import Control.Monad
 import Control.Monad.Trans.State
+import Data.Either
 
 ------------------------------------------------------------------------------
 -- Ex 1: Count how many numbers in the input list are in the given
@@ -21,7 +22,8 @@ import Control.Monad.Trans.State
 --   countRange 1 3 [1,2,3,4,5] ==> 3
 
 countRange :: Int -> Int -> [Int] -> Int
-countRange low high is = undefined
+countRange low high is = length $ filter isInRange is 
+  where isInRange v = (v >= low) && (v <= high)
 
 ------------------------------------------------------------------------------
 -- Ex 2: Build a string that looks like an n*m chessboard:
@@ -39,7 +41,11 @@ countRange low high is = undefined
 -- in GHCi
 
 chess :: Int -> Int -> String
-chess = undefined
+chess n m = (intercalate "\n" $ group' m (take (n*m) $ concat $ repeat ['#','.']))  ++ "\n"
+
+group' :: Int -> [a] -> [[a]]
+group' _ [] = []
+group' n l = (take n l) : (group' n (drop n l))
 
 ------------------------------------------------------------------------------
 -- Ex 3: Implement the function palindromify that chops a character
@@ -53,7 +59,8 @@ chess = undefined
 --   palindromify "abracacabra" ==> "acaca"
 
 palindromify :: String -> String
-palindromify = undefined
+palindromify s = if ispalindrome then s else palindromify $ tail $ init s
+  where ispalindrome = s == (reverse s)
 
 ------------------------------------------------------------------------------
 -- Ex 4: Remove all repetitions of elements in a list. That is, if an
@@ -63,15 +70,14 @@ palindromify = undefined
 -- DO NOT use any library list functions like head, tail, (++) and so on.
 -- USE ONLY recursion and pattern matching to process the list.
 --
--- It's ok to use (==) or compare obviously. If-then-else and guards
--- are fine too as long as you pattern match the list.
---
 -- Examples:
 --   unrepeat [True,True,True,True] => [True]
 --   unrepeat [1,1,2,1,3,3,3] => [1,2,1,3]
 
 unrepeat :: Eq a => [a] -> [a]
-unrepeat = undefined
+unrepeat [] = []
+unrepeat as = foldl (\a x -> if lastIsSame a x then a else a ++ [x]) [head as] as 
+  where lastIsSame a x = (last a) == x
 
 ------------------------------------------------------------------------------
 -- Ex 5: Given a list of Either String Int, sum all the integers.
@@ -82,7 +88,9 @@ unrepeat = undefined
 --   sumEithers [Left "fail", Right 1, Left "xxx", Right 2] ==> Just 3
 
 sumEithers :: [Either String Int] -> Maybe Int
-sumEithers = undefined
+sumEithers as = if length summable == 0 then Nothing else Just (sum summable)
+  where summable = rights as
+  
 
 ------------------------------------------------------------------------------
 -- Ex 6: Define the data structure Shape with values that can be
