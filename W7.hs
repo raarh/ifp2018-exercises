@@ -11,7 +11,6 @@ module W7 where
 import Data.List
 import Control.Monad
 import Control.Monad.Trans.State
-import Data.Either
 
 ------------------------------------------------------------------------------
 -- Ex 1: Count how many numbers in the input list are in the given
@@ -76,8 +75,9 @@ palindromify s = if ispalindrome then s else palindromify $ tail $ init s
 
 unrepeat :: Eq a => [a] -> [a]
 unrepeat [] = []
-unrepeat as = foldl (\a x -> if lastIsSame a x then a else a ++ [x]) [head as] as 
-  where lastIsSame a x = (last a) == x
+unrepeat [x] = [x]
+unrepeat (x:y:xs) = if x == y then unrepeat (y:xs) else x : unrepeat (y:xs)
+
 
 ------------------------------------------------------------------------------
 -- Ex 5: Given a list of Either String Int, sum all the integers.
@@ -88,8 +88,12 @@ unrepeat as = foldl (\a x -> if lastIsSame a x then a else a ++ [x]) [head as] a
 --   sumEithers [Left "fail", Right 1, Left "xxx", Right 2] ==> Just 3
 
 sumEithers :: [Either String Int] -> Maybe Int
-sumEithers as = if length summable == 0 then Nothing else Just (sum summable)
-  where summable = rights as
+sumEithers [] = Nothing
+sumEithers as = sumEithers' as 0 Nothing
+  where 
+    sumEithers' [] s l              = if l == Nothing then Nothing else (Just s)
+    sumEithers' ((Right b): bs) s l = sumEithers' bs (s + b) (Just b)
+    sumEithers' ((Left b): bs) s  l = sumEithers' bs s l
   
 
 ------------------------------------------------------------------------------
