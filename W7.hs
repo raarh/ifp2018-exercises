@@ -76,7 +76,7 @@ palindromify s = if ispalindrome then s else palindromify $ tail $ init s
 unrepeat :: Eq a => [a] -> [a]
 unrepeat [] = []
 unrepeat [x] = [x]
-unrepeat (x:y:xs) = if x == y then unrepeat (y:xs) else x : unrepeat (y:xs)
+unrepeat (x:rest@(y:_)) = if x == y then unrepeat rest else x : unrepeat (rest)
 
 
 ------------------------------------------------------------------------------
